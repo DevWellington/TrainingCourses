@@ -1,0 +1,8 @@
+{
+	"autoload": {
+		"psr-0": {
+			"MeuFramework" : "src",
+			"Mvc": "app"
+		}
+	}
+}
