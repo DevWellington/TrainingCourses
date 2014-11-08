@@ -1,0 +1,11 @@
+{
+	"config":{
+		"bin-dir": "bin/" 
+	},
+	"autoload": {
+		"psr-0": {"CodeEducation": "src/"}
+	},
+	"require": {
+		"phpunit/phpunit": "4.2.6"
+	}
+}
