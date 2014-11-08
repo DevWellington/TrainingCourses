@@ -1,8 +1,8 @@
 <?php
 
-namespace MeuFramework\Helpers;
+namespace MeuFramework\Helpers\Strings;
 
-trait Strings_Converter
+trait Converter
 {
 	public $string;
 

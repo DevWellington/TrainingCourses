@@ -6,7 +6,7 @@ class Routes
 {
 
 	use \MeuFramework\Helpers\Request;
-	use \MeuFramework\Helpers\Strings_converter;
+	use \MeuFramework\Helpers\Strings\Converter;
 
 	protected $config;
 
@@ -19,6 +19,9 @@ class Routes
 
 	public function load()
 	{
+
+		var_dump($this->request()['path_info']);
+
 		$path = $this->request()['path_info'];
 		if (!empty($this->config[$path])) {
 			$routes = $this->config[$path];
