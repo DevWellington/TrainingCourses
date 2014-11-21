@@ -5,6 +5,11 @@ namespace CodeEducation\Cliente;
 class ClienteTest extends \PHPUnit_Framework_TestCase
 {
 
+    public function setUp()
+    {
+        
+    }
+
     public function testVerificarSeOGetESetNome()
     {
         $cliente = new \CodeEducation\Cliente\Cliente();
