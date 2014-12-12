@@ -4,10 +4,10 @@ namespace CodeEducation\Cliente;
 
 class ClienteTest extends \PHPUnit_Framework_TestCase
 {
-
+ 
     public function setUp()
     {
-        
+
     }
 
     public function testVerificarSeOGetESetNome()
@@ -51,5 +51,32 @@ class ClienteTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($cliente->sendEmail());
     }
+
+    public function testVerificaSeNaoConsegueEnviarEmail()
+    {
+
+        $mailTransport = $this->getMock('\CodeEducation\Mail\SendMail', array('send'));
+        $mailTransport
+            ->expects($this->once())
+            ->method('send')
+            ->willReturn(false)
+        ;
+
+        $cliente = new \CodeEducation\Cliente\Cliente();
+        $cliente->setMailTransport($mailTransport);
+
+        $this->assertFalse($cliente->sendEmail());
+    }    
+
+    public function testVerificaSeGetMailTransportRetornaUmSendMail()
+    {
+
+        $mailTransport = $this->getMock('\CodeEducation\Mail\SendMail', array('send'));
+        
+        $cliente = new Cliente();
+        $cliente->setMailTransport($mailTransport);
+
+        $this->assertInstanceOf('\CodeEducation\Mail\SendMail', $cliente->getMailTransport());
+    }        
 
 }
