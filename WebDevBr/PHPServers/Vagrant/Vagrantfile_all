@@ -1,0 +1,16 @@
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize [modifyvm, :id, "--memory", 512]
+  end
+
+  config.vm.define :apache do |a_config|
+    a_config.vm.box = "ubuntu14.10x86"
+    a_config.vm.hostname = "apache"
+    a_config.vm.network :private_network, :ip => "192.168.29.10"
+    a_config.vm.network "forwarded_port", guest: 80, host: 8080
+  end
+  
+end
