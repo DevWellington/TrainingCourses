@@ -6,6 +6,7 @@
 		"psr-0": {"CodeEducation": "src/"}
 	},
 	"require": {
-		"phpunit/phpunit": "4.2.6"
+		"phpunit/phpunit": "4.2.6",
+		"phpunit/phpunit-selenium": ">=1.2"
 	}
 }
