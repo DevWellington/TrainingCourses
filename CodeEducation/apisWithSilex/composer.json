@@ -1,5 +1,11 @@
 {
     "require": {
         "silex/silex": "~1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "CodeEducation\\Sistema\\": "src/CodeEducation/Sistema/"
+        }
     }
+
 }

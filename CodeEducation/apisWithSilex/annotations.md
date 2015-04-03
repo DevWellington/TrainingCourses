@@ -168,7 +168,246 @@ $app->get('/ola/{nome}', function($nome){
 $app->run();
 ```
 
+## SERVIÇOS
 
+Organizar melhor a estrutura do software;
+
+### Mudando o autoload
+
+- Criando a camada de serviços
+    - Regra de negocios
+
+```shell    
+mkdir ./src/CodeEducation
+mkdir ./src/CodeEducation/Sistema
+```
+
+PSR - 4
+
+```json
+{
+    "require": { 
+        "silex/silex": "~1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "CodeEducation\\Sistema\\": "src/CodeEducation/Sistema"
+        }
+    }
+}
+```
+    
+### Criando a estrutura de Cliente
+
+- Iniciar a criacao da estrutura;
+- Cadastro de cliente simples;
+
+Concentrar nossas regras de negocios
+
+
+```shell
+mkdir src/CodeEducation/Sistema/Entity
+touch src/CodeEducation/Sistema/Entity/Cliente.php
+
+mkdir src/CodeEducation/Sistema/Mapper
+touch src/CodeEducation/Sistema/Mapper/ClienteMapper.php
+```
+
+```php
+namespace CodeEducation\Sistema\Entity;	
+
+class Cliente
+{
+	private $nome;
+	private $email;
+	
+	//getters and setters
+}
+```
+
+- Mapper:
+    - Responsavel por relacionar os dados da Entidade com o Banco de Dados;
+
+
+```php
+namespace CodeEducation\Sistema\Mapper;
+
+use CodeEducation\Sistema\Entity\Cliente;
+
+class ClienteMapper
+{
+    public function insert(Cliente $cliente)
+    {
+        return [
+            'nome' => 'Cliente XPTO',
+            'email' => 'email@clientexpto.com'
+        ];
+    }
+}
+```
+
+### Criando controller do cliente
+
+```php
+
+use CodeEducation\Sistema\Entity\Cliente;
+use CodeEducation\Sistema\Mapper\ClienteMapper;
+
+$app->get("/cliente", function() use ($app){
+    
+    $dados['nome'] = "Cliente";
+    $dados['email'] = "email@cliente.com";
+    
+    $clienteEntity = new Cliente();
+    $clienteEntity->setNome($dados['nome']);
+    $clienteEntity->setEmail($dados['email']);
+    
+    $mapper = new ClienteMapper();
+    $result = $mapper->insert($clienteEntity);
+    
+    return $app->json($result);
+});
+```
+
+O processo de inserir o cliente não pode ser responsabilidade do Controller.
+
+Deve-se separar a responsabilidade (para um serviço);
+
+### Criando ClienteService
+
+Caso seja necessario inserir uma informação/rotina antes ou depois de inserir o cliente, esta nova nessa funcionalidade, será replicada em todas as partes do sistema.
+
+Duplicando codigo e dificultando a manutencao do mesmo. 
+
+Muito ruim :(
+
+Para isso criaremos um **Container de Serviços**
+
+```shell
+mkdir src/CodeEducation/Sistema/Service
+touch src/CodeEducation/Sistema/Service/ClienteService.php
+```
+
+Todas as regras especificas de Cliente
+```php
+namespace CodeEducation\Sistema\Service;
+
+use CodeEducation\Sistema\Entity\Cliente;
+use CodeEducation\Sistema\Mapper\ClienteMapper;
+
+class ClienteService
+{
+    public function insert(array $data)
+    {    
+        $clienteEntity = new Cliente();
+        $clienteEntity->setNome($data['nome']);
+        $clienteEntity->setEmail($data['email']);
+        
+        $mapper = new ClienteMapper();
+        $result = $mapper->insert($clienteEntity);    
+        
+        return $result;
+    }
+      
+}
+
+```
+
+Toda regra foi separada para o Servico.
+
+```php
+use CodeEducation\Sistema\Service\ClienteService;
+
+$app->get("/cliente", function() use ($app){
+    
+    $dados['nome'] = "Cliente";
+    $dados['email'] = "email@cliente.com";
+    
+    $clienteService = new ClienteService();
+    $result = $clienteService->insert($dados);
+    
+    return $app->json($result);
+});
+```
+
+### Desacoplando
+
+Com o `new Cliente` e o `new ClienteMapper` na Classe **ClienteService** o acoplamento esta muito forte/alto e perde funcionalidade para uso em outros sistemas.
+
+Para contornar utilizaremos Dependency Injection, passando as dependencias para o construtor
+
+```php
+class ClienteService
+{
+    private $cliente;
+    private $clienteMapper;
+    
+    public function __construct(Cliente $cliente, ClienteMapper $clienteMapper)
+    {
+        $this->cliente = $cliente;
+        $this->clienteMapper = $clienteMapper;
+    }
+
+    public function insert(array $data)
+    {    
+        $clienteEntity = $this->cliente;
+        $clienteEntity->setNome($data['nome']);
+        $clienteEntity->setEmail($data['email']);
+        
+        $mapper = $this->clienteMapper;
+        $result = $mapper->insert($clienteEntity);    
+        
+        return $result;
+    }    
+}
+```
+
+Passamos a criação para o Controller e removemos o acoplamento da Classe ClienteService;
+  
+```php
+$app->get('/cliente', function() use ($app){
+    $dados['nome'] = "Cliente";
+    $dados['email'] = "email@cliente.com";
+
+    $clienteEntity = new Cliente;
+    $clienteMapper = new ClienteMapper();
+
+    $clienteService = new ClienteService($clienteEntity, $clienteMapper);
+    $result = $clienteService->insert($dados);
+
+    return $app->json($result);
+});
+```
+
+Mas ainda assim, ainda temos o problema do acoplamento, mas agora no Controller.
+
+### Criando container de serviço
+
+Para isso utilizaremos o Container de Serviços do Silex (Pimple (Service Container)), e teremos o acesso facilitado.
+
+Arquivo: **index.php**
+
+```php
+
+$app['clienteService'] = function()
+{
+    $clienteEntity = new Cliente;
+    $clienteMapper = new ClienteMapper();
+
+    return new ClienteService($clienteEntity, $clienteMapper);
+};
+
+
+$app->get('/cliente', function() use ($app){
+    $dados['nome'] = "Cliente";
+    $dados['email'] = "email@cliente.com";
+
+    $result = $app['clienteService']->insert($dados);
+
+    return $app->json($result);
+});
+
+```
 
 
 
