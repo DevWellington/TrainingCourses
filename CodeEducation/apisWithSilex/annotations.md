@@ -409,8 +409,169 @@ $app->get('/cliente', function() use ($app){
 
 ```
 
+## TWIG
 
+### Instalando o Twig
 
+http://twig.sensiolabs.org/
+
+**With Silex:** http://silex.sensiolabs.org/doc/providers/twig.html
+
+composer.json
+```json
+"twig/twig": ">=1.8,<2.0-dev",
+"symphony/twig-bridge": "~2.3"
+
+```
+
+Registrando o Serviço
+```php
+$app->register(new Silex\Provider\TwigServiceProvider(), array(
+	'twig.path' => __DIR__.'../views',
+));
+```
+
+### Renderizando
+
+```php
+$app->get('/', function() use ($app){
+    return $app['twig']->render('index.twig', []);
+});
+
+```
+
+index.twig
+```html
+<h1>Bem vindo ao Twig!!!</h1>
+```
+
+```php
+$app->get('/ola/{nome}', function($nome) use ($app){
+    return $app['twig']->render(
+        'ola.twig', 
+        array('nome' => $nome)
+    );
+});
+
+```
+
+ola.twig
+```html
+Ola {{ nome }}
+```
+
+### Listando dados
+
+```php
+
+class ClienteMapper
+{
+    ...
+
+    public function fetchAll()
+    {
+        $dados[0]['nome'] = 'Cliente XPTO';
+        $dados[0]['email'] = 'cliente@xpto.com';
+
+        $dados[1]['nome'] = 'Cliente Y';
+        $dados[1]['email'] = 'cliente@y.com';
+    }
+}
+
+class ClienteService
+{
+    public function fetchAll()
+    {
+        $this->clienteMapper->fetchAll();
+    }
+}
+
+$app->get('/clientes', function() use ($app){
+    $dados = $app['clienteService']->fetchAll();
+    return $app['twig']->render('list.twig', ['clientes' => $dados]);
+});
+```
+
+clientes.twig
+```html
+<h1>Clientes</h1>
+
+<ul>
+    {% for cliente in clientes %}
+        <li>{{ cliente }}</li>
+    {% endfor %}
+</ul>
+```
+
+### Linkando
+
+[UrlGeneratorServiceProvider](http://silex.sensiolabs.org/doc/providers/url_generator.html)
+
+```php
+$app->register(new Silex\Provider\UrlGeneratorServiceProvider());
+
+$app->get('/', function() use ($app){
+    return $app['twig']->render('index.twig', []);
+})
+    ->bind('index');
+```
+
+ola.twig
+```html
+Ola {{ nome }}
+<br />
+Eu quero id para o <a href="{{ path('index') }}">Index</a>
+```
+
+### Layouts
+
+layout.twig
+```html
+<html>
+    <head>
+        <title>{% block title %}Nosso template{% endblock %}</title>    
+    </head>
+    <body>
+        {% block aplicacao %}
+            <h1> Essa eh a nossa aplicacao</h1>
+        {% endblock %}
+            {% block conteudo %}
+                
+            {% endblock %}
+        <footer>Todos os direitos reservados</footer>
+    </body>
+</html>
+```
+
+index.twig
+```html
+{% extends "layout.twig" %}
+{% block title %}
+    Nosso template
+{% endblock %}
+
+{% block aplicacao %}
+    <h1> Essa eh a Index</h1>
+{% endblock %}
+{% block conteudo %}
+    <h1>Bem vindo ao Twig!!!</h1>
+{% endblock %}
+```
+
+### Questions of Module
+
+1. Qual é o nome do container de serviços que o Silex foi baseado?
+    
+    R.: Pimple
+    
+2. O que é uma API?
+    
+    R.: É uma Interface / Serviço criado para que outros softwares consigam consumir
+    
+3. O Silex foi desenvolvido baseado nos componentes do Framework:
+
+    R.: Symfony
+    
 
 
 

@@ -18,13 +18,30 @@ $app['clienteService'] = function()
     return new ClienteService($clienteEntity, $clienteMapper);
 };
 
-$app->get('/', function() use ($response){
-    $response->setContent('Hello world!');
-    return $response;
+// $app->get('/', function() use ($response){
+//     $response->setContent('Hello world!');
+//     return $response;
+// });
+
+// $app->get('/ola/{nome}', function($nome){
+//     return "Ola {$nome}";
+// });
+
+$app->get('/', function() use ($app){
+    return $app['twig']->render('index.twig', []);
+})
+	->bind('index');
+
+$app->get('/ola/{nome}', function($nome) use ($app){
+    return $app['twig']->render('ola.twig', ['nome' => $nome]);
 });
 
-$app->get('/ola/{nome}', function($nome){
-    return "Ola {$nome}";
+$app->get('/clientes', function() use ($app){
+    
+    $dados = $app['clienteService']->fetchAll();
+
+    return $app['twig']->render('list.twig', ['clientes' => $dados]);
+    
 });
 
 $app->get('/cliente', function() use ($app){
