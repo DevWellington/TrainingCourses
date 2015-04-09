@@ -420,7 +420,7 @@ http://twig.sensiolabs.org/
 composer.json
 ```json
 "twig/twig": ">=1.8,<2.0-dev",
-"symphony/twig-bridge": "~2.3"
+"symfony/twig-bridge": "~2.3"
 
 ```
 
@@ -572,6 +572,166 @@ index.twig
 
     R.: Symfony
     
+
+## APIS
+
+### Falando dos métodos HTTP
+
+Implementando o WebService;
+
+Api REST utiliza os metodos HTTP
+
+- GET - **/api/clientes** (Listar todos os registros)
+- GET - **/api/clientes/203** (Listar um registro)
+- POST - **/api/clientes** (Adicionar um registro)
+- PUT - **/api/clientes/204** (Alterar um registro)
+- DELETE **/api/clientes/205** (Remover um registro)
+
+### Listando clientes
+
+```php
+$app->get('/api/clientes/', function() use($app){
+    $dados = $app['clienteService']->fetchAll();
+    return $app->json($dados);
+});
+```
+
+Utilize o plugin Postman (Google Chrome) para testes das APIs
+
+### Listando apenas 1 cliente
+
+```php
+class ClienteMapper
+{
+    private $dados = [
+        0 => [
+            'id' => 0,
+            'nome' => 'Cliente XPTO',
+            'email' => 'cliente@xpto.com'
+        ],
+
+        1 => [
+            'id' => 1,
+            'nome' => 'Cliente y',
+            'email' => 'cliente@y.com'
+        ],
+    ];
+    
+    public function fetchAll()
+    {
+        return $this->dados;
+    }
+    
+    public function find($id)
+    {
+        return $this->dados[$id];
+    }
+}
+```
+    
+### Criando um cliente
+
+```php
+use Symfony\Components\HttpFoundation\Request;
+
+$app->post('/api/clientes', function(Request $request) use ($app){
+
+    $dados['nome'] = $request->get('nome');
+    $dados['email'] = $request->get('email');    
+    
+    $result = $app['clienteService']->insert($dados);
+    
+    return $app->json($result);
+});
+
+```
+
+### Alterando e removendo
+
+**PUT - Alterar os registros**
+
+- ClienteMapper
+
+```php
+    public function update($id, array $array)
+    {
+        return [
+            'success' => true
+        ];
+    }    
+```
+
+- ClienteService
+
+```php
+    public function update($id, array $array)
+    {
+        return $this->clienteMapper->update($id, $array);
+    }   
+
+```
+
+- Controller
+
+```php
+use Symfony\Components\HttpFoundation\Request;
+
+$app->put('/api/clientes/{id}', function(Request $request) use ($app){
+
+    $dados['nome'] = $request->get('nome');
+    $dados['email'] = $request->get('email');    
+    
+    $result = $app['clienteService']->update($dados);
+    
+    return $app->json($result);
+});
+
+```
+
+**DELETE - Apagando registros**
+
+- ClienteMapper
+
+```php
+    public function delete($id)
+    {
+        return [
+            'success' => true
+        ];
+    }    
+```
+
+- ClienteService
+
+```php
+    public function delete($id)
+    {
+        return $this->clienteMapper->delete($id, $array);
+    }   
+
+```
+
+- Controller
+
+```php
+use Symfony\Components\HttpFoundation\Request;
+
+$app->delete('/api/clientes/{id}', function(Request $request) use ($app){
+
+    $result = $app['clienteService']->delete($dados);
+    
+    return $app->json($result);
+});
+
+```
+
+
+
+
+
+
+
+
 
 
 

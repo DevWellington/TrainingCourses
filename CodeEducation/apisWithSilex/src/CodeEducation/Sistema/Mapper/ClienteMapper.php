@@ -26,4 +26,17 @@ class ClienteMapper
         return $dados;
     }
 
+    public function update($id, array $array)
+    {
+        return [
+            'success' => true
+        ];
+    }
+        
+    public function delete($id)
+    {
+        return [
+            'success' => true
+        ];
+    } 
 }

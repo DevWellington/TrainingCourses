@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use CodeEducation\Sistema\Service\ClienteService;
 use CodeEducation\Sistema\Entity\Cliente;
 use CodeEducation\Sistema\Mapper\ClienteMapper;
-
+use Symfony\Components\HttpFoundation\Request;
 
 $response = new Response();
 
@@ -34,6 +34,33 @@ $app->get('/', function() use ($app){
 
 $app->get('/ola/{nome}', function($nome) use ($app){
     return $app['twig']->render('ola.twig', ['nome' => $nome]);
+});
+
+$app->post('/api/clientes', function(Request $request) use ($app){
+
+    $dados['nome'] = $request->get('nome');
+    $dados['email'] = $request->get('email');    
+    
+    $result = $app['clienteService']->insert($dados);
+    
+    return $app->json($result);
+});
+
+$app->put('/api/clientes/{id}', function(Request $request) use ($app){
+
+    $dados['nome'] = $request->get('nome');
+    $dados['email'] = $request->get('email');    
+    
+    $result = $app['clienteService']->update($dados);
+    
+    return $app->json($result);
+});
+
+$app->delete('/api/clientes/{id}', function(Request $request) use ($app){
+
+    $result = $app['clienteService']->delete($dados);
+    
+    return $app->json($result);
 });
 
 $app->get('/clientes', function() use ($app){

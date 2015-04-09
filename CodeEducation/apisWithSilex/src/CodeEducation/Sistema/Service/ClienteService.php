@@ -31,6 +31,16 @@ class ClienteService
     public function fetchAll()
     {
         return $this->clienteMapper->fetchAll();
-    }    
+    }
+
+    public function update($id, array $array)
+    {
+        return $this->clienteMapper->update($id, $array);
+    }
+
+    public function delete($id)
+    {
+        return $this->clienteMapper->delete($id, $array);
+    }
 
 }
