@@ -44,6 +44,8 @@ Não desenvolva uma API somente se for necessário disponibiliza-la, pois em alg
 
 Uma aplicação ja desenvolvida pode utilizar uma API normalmente mesmo que ela não seja compartilhada com outras aplicações. Com isso a API so será acessada **internamente** sem acesso externo.
 
+Podemos utilizar o [Guzzle](https://github.com/guzzle/guzzle/tree/v3.8.1) para esse caso, onde minha aplicação consome minha propria API;
+
 
 ### Instalando o Silex
 
