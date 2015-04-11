@@ -6,16 +6,17 @@ use Symfony\Component\HttpFoundation\Response;
 use CodeEducation\Sistema\Service\ClienteService;
 use CodeEducation\Sistema\Entity\Cliente;
 use CodeEducation\Sistema\Mapper\ClienteMapper;
-use Symfony\Components\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Request;
 
 $response = new Response();
 
-$app['clienteService'] = function()
+$app['clienteService'] = function() use ($em)
 {
     $clienteEntity = new Cliente;
-    $clienteMapper = new ClienteMapper();
+    $clienteMapper = new ClienteMapper($em);
+    $clienteService = new ClienteService($clienteEntity, $clienteMapper);
 
-    return new ClienteService($clienteEntity, $clienteMapper);
+    return $clienteService;
 };
 
 // $app->get('/', function() use ($response){

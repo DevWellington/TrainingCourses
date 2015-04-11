@@ -3,15 +3,32 @@
 namespace CodeEducation\Sistema\Mapper;
 
 use CodeEducation\Sistema\Entity\Cliente;
+use Doctrine\ORM\EntityManager;
 
 class ClienteMapper
 {
+    private $em;
 
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+    
     public function insert(Cliente $cliente)
     {
+        // Vai pra fila para ser inserido no banco de dados
+        $this->em->persist($cliente);
+        
+        // Concretiza os dados no banco;
+        $this->em->flush();
+
         return [
-            'nome' => 'Cliente XPTO',
-            'email' => 'email@clientexpto.com'
+            'success' => true,
+            'data' => [
+                'id' => $cliente->getId(),
+                'nome' => $cliente->getNome(),
+                'email' => $cliente->getEmail()
+            ]
         ];
     }
 

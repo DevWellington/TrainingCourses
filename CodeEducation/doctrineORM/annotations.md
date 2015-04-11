@@ -80,3 +80,231 @@ $em = EntityManager::create(
     $evm
 );
 ```
+
+### Configurando o console
+
+Linha de comandos do doctrine. 
+
+Muito utilizado para criar:
+
+- Bancos de Dados;
+- Schemas;
+- etc;
+
+`php bin/doctrine;'
+
+Necessário criar o arquivo **cli-config.php**
+
+```php
+
+<?php
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+
+// replace with file to your own project bootstrap
+require_once '../bootstrap.php';
+
+// replace with mechanism to retrieve EntityManager in your app
+$entityManager = $em;
+
+return ConsoleRunner::createHelperSet($entityManager);
+
+```
+
+O arquivo cli-config.php é relativo ao doctrine, por esse motivo devemos estar na pasta bin/ para executar o console.
+`cd bin/`
+
+`php doctrine`
+
+
+### Criando nossa primeira entidade
+
+```php
+
+namespace CodeEducation\Sistema\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="clientes")
+ */
+ 
+class Cliente
+{
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
+     */
+    private $id;
+    
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+	private $nome;
+	
+	/**
+	 * @ORM\Column(type="string", length=255)
+	 */
+	private $email;
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param mixed $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNome()
+    {
+        return $this->nome;
+    }
+
+    /**
+     * @param mixed $nome
+     */
+    public function setNome($nome)
+    {
+        $this->nome = $nome;
+    }
+}
+
+```
+
+
+### Gerando Schema
+
+```sql
+CREATE DATABASE trilhando_doctrine;
+```
+
+Alguns comandos do console do doctrine;
+
+- Informaçoes sobre as Entidades
+```sh
+php doctrine orm:info
+
+///
+Found 1 mapped entities:
+[OK]   CodeEducation\Sistema\Entity\Cliente
+///
+```
+
+- Criando a tabela do Danco de Dados baseada na nossa Entidade
+```sh
+php doctrine orm:schema-tool:create
+
+///
+ATTENTION: This operation should not be executed in a production environment.
+
+Creating database schema...
+Database schema created successfully!
+///
+```
+
+- Verificando o SQL que ele utiliza
+```sh
+php doctrine orm:schema-tool:create --dump-sql
+
+///
+CREATE TABLE clientes (id INT AUTO_INCREMENT NOT NULL, nome VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB;
+///
+```
+
+### Persistindo
+
+Utilizando o ClienteMapper para persistir os dados
+
+```php
+
+use Doctrine\ORM\EntityManager;
+
+
+class ClienteMapper
+{
+    private $em;
+
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+    
+    public function insert(Cliente $cliente)
+    {
+        // Vai pra fila para ser inserido no banco de dados
+        $this->em->persist($cliente);
+        
+        // Concretiza os dados no banco;
+        $this->em->flush();
+        
+        // Retornando os dados do cliente
+        
+        return [
+            'success' => true,
+            'data' => [
+                'id' => $cliente->getId(),
+                'nome' => $cliente->getNome(),
+                'email' => $cliente->getEmail()
+            ]
+        ];
+    }
+}
+```
+
+- Controllers (index)
+```php
+$app['clienteService'] = function() use ($em)
+{
+    $clienteEntity = new Cliente;
+    $clienteMapper = new ClienteMapper($em);
+
+    return new ClienteService($clienteEntity, $clienteMapper);
+};
+```
+
+
+
+
+
+        
+        
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
