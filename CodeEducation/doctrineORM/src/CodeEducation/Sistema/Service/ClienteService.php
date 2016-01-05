@@ -2,45 +2,43 @@
 
 namespace CodeEducation\Sistema\Service;
 
-use CodeEducation\Sistema\Entity\Cliente;
-use CodeEducation\Sistema\Mapper\ClienteMapper;
+use CodeEducation\Sistema\Entity\Cliente as ClienteEntity;
 
 class ClienteService
 {
     private $cliente;
-    private $clienteMapper;
+    private $em;
 
-    public function __construct(Cliente $cliente, ClienteMapper $clienteMapper)
+    public function __construct(EntityManager $em)
     {
-        $this->cliente = $cliente;
-        $this->clienteMapper = $clienteMapper;
+        $this->em = $em;
     }
 
     public function insert(array $data)
     {
-        $clienteEntity = $this->cliente;
+        $clienteEntity = new ClienteEntity;
         $clienteEntity->setNome($data['nome']);
         $clienteEntity->setEmail($data['email']);
 
-        $mapper = $this->clienteMapper;
-        $result = $mapper->insert($clienteEntity);
+        $this->em->persist($clienteEntity);
+        $this->em->flush();
 
-        return $result;
+        return $clienteEntity;
     }
 
     public function fetchAll()
     {
-        return $this->clienteMapper->fetchAll();
+
     }
 
     public function update($id, array $array)
     {
-        return $this->clienteMapper->update($id, $array);
+
     }
 
     public function delete($id)
     {
-        return $this->clienteMapper->delete($id, $array);
+
     }
 
 }

@@ -1,4 +1,6 @@
-## DOCTRINE 
+# DOCTRINE 
+
+## INICIANDO
 
 ### Falando sobre o Doctrine
 
@@ -282,10 +284,37 @@ $app['clienteService'] = function() use ($em)
 };
 ```
 
+## REFATORANDO
 
+### Ajustando a estrutura
 
+```php
+<?php
 
+use CodeEducation\Sistema\Entity\Cliente as ClienteEntity;
 
+class ClienteService
+{
+    private $cliente;
+    private $em;
+
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
+    public function insert(array $data)
+    {
+        $clienteEntity = new ClienteEntity;
+        $clienteEntity->setNome($data['nome']);
+        $clienteEntity->setEmail($data['email']);
+
+        $this->em->persist($clienteEntity);
+        $this->em->flush();
+
+        return $clienteEntity;
+    }
+```
         
         
     
