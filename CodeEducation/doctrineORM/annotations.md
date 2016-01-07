@@ -289,8 +289,6 @@ $app['clienteService'] = function() use ($em)
 ### Ajustando a estrutura
 
 ```php
-<?php
-
 use CodeEducation\Sistema\Entity\Cliente as ClienteEntity;
 
 class ClienteService
@@ -316,7 +314,31 @@ class ClienteService
     }
 ```
         
-        
+### Utilizando o GetReference
+
+Os Repositories armazenam consultas que realizamos no DB.
+
+
+```php
+
+public function update($id, array $array)
+{
+    //$repository = $this->em->getRepository("Code\Sistema\Entity\Cliente");
+    //$cliente = $repository->find($id);
+
+    // Entidade Vazia - Objeto Proxy sem necessidade de consultar no banco de dados 
+    $cliente = $this->em->getReference("Code\Sistema\Entity\Cliente", $id);
+
+    $cliente->setNome($array['nome']);
+    $cliente->setEmail($array['email']);
+
+    $this->em->persist($cliente);
+    $this->em->flush();
+
+    return $cliente;
+}
+
+```
     
     
     

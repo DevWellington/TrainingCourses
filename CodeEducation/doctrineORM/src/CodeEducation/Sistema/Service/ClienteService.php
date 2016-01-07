@@ -33,7 +33,19 @@ class ClienteService
 
     public function update($id, array $array)
     {
+        //$repository = $this->em->getRepository("Code\Sistema\Entity\Cliente");
+        //$cliente = $repository->find($id);
 
+        // Entidade Vazia - Objeto Proxy sem necessidade de consultar no banco de dados 
+        $cliente = $this->em->getReference("Code\Sistema\Entity\Cliente", $id);
+
+        $cliente->setNome($array['nome']);
+        $cliente->setEmail($array['email']);
+
+        $this->em->persist($cliente);
+        $this->em->flush();
+
+        return $cliente;
     }
 
     public function delete($id)
